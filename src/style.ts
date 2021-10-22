@@ -9,6 +9,13 @@ export const AppStyle = styled.div`
             width:100%;
             display:flex;
             justify-content:flex-start;
+            margin-bottom:20px;
+            .item{
+                margin-right:10px;
+                width:100%;
+                display:flex;
+                align-items:flex-end;
+            }
         }
     }
 `
