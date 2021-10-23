@@ -260,7 +260,7 @@ function App() {
                 }}
               />
             </div>
-            <div className="item">
+            <div className="item button-content">
               <CustomButton color={'var(--green)'} eventCallback={clearFilter} border={'var(--green)'} label="Limpar Filtros" icon={<Clear />} />
               <CustomButton color={'#FFF'} bgColor={'var(--green)'} label="Filtrar" icon={<Search />} eventCallback={handleFilter} />
             </div>

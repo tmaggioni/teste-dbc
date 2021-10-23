@@ -1,13 +1,10 @@
 {
-  "homepage": "https://tmaggioni.github.io/teste-dbc",
   "name": "teste-dbc",
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "serve": "vite preview",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@mui/icons-material": "^5.0.4",
@@ -25,7 +22,6 @@
     "@types/react-dom": "^17.0.0",
     "@types/styled-components": "^5.1.15",
     "@vitejs/plugin-react": "^1.0.0",
-    "gh-pages": "^3.2.3",
     "typescript": "^4.3.2",
     "vite": "^2.6.4"
   }
