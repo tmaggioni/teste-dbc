@@ -9,53 +9,49 @@ import { DateField } from './components/DateField'
 import { CustomButton } from './components/CustomButton'
 import Clear from './assets/icons/clear';
 import Search from './assets/icons/search';
-// import { DataGrid } from '@material-ui/core/Grid';
+import { makeStyles } from '@mui/styles';
 
+import { SituationType } from './components/SituationType'
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
-const columns = [
-  { field: 'id', headerName: 'ID', width: 70 },
-  { field: 'firstName', headerName: 'First name', width: 130 },
-  { field: 'lastName', headerName: 'Last name', width: 130 },
-  {
-    field: 'age',
-    headerName: 'Age',
-    type: 'number',
-    width: 90,
-  },
-  {
-    field: 'fullName',
-    headerName: 'Full name',
-    description: 'This column has a value getter and is not sortable.',
-    sortable: false,
-    width: 160,
-    valueGetter: (params: any) =>
-      `${params.getValue(params.id, 'firstName') || ''} ${
-        params.getValue(params.id, 'lastName') || ''
-      }`,
-  },
-];
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import Button from '@mui/material/Button';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 
-const rows = [
-  { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
-  { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
-  { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
-  { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
-  { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-  { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
-  { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-  { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-  { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
-];
-
-
-
-interface FilterOptions {
+interface ICommitties {
+  id: string;
   coverage: string;
   central: string | number;
   cooperative: string | number;
   agency: string | number;
   situation: string;
-  number: string | number;
+  date_start: string | Date | null;
+  date_end: string | Date | null;
+}
+
+const rows: ICommitties[] = [
+  { id: "1", coverage: 'Agência', central: '1001', cooperative: 1586, agency: 22, date_start: '13/10/2021', date_end: '14/10/2021', situation: 'vigente' },
+  { id: "2", coverage: 'Agência', central: '1002', cooperative: 1586, agency: 23, date_start: '14/10/2021', date_end: '15/10/2021', situation: 'encerrado' },
+  { id: "3", coverage: 'Agência', central: '1003', cooperative: 1586, agency: 24, date_start: '15/10/2021', date_end: '16/10/2021', situation: 'inativo' },
+  { id: "4", coverage: 'Agência', central: '1001', cooperative: 1586, agency: 25, date_start: '16/10/2021', date_end: '17/10/2021', situation: 'vigente' },
+  { id: "5", coverage: 'Cooperativa', central: '1001', cooperative: 1586, agency: 25, date_start: '17/10/2021', date_end: '18/10/2021', situation: 'vigente' },
+];
+
+
+interface FilterOptions {
+  id: string | number;
+  coverage: string;
+  central: string | number;
+  cooperative: string | number;
+  agency: string | number;
+  situation: string;
   date_start: string | Date | null;
   date_end: string | Date | null;
 }
@@ -66,17 +62,19 @@ const coverageOptions = [
 ]
 
 const centralOptions = [
-  { label: "1234", value: "1234" },
+  { label: "1001", value: "1001" },
   { label: "1235", value: "1235" },
 ]
 const cooperativeOptions = [
-  { label: "6586", value: "6586" },
+  { label: "1586", value: "1586" },
   { label: "2568", value: "2568" },
 ]
 
 const agencyOptions = [
+  { label: "22", value: "22" },
   { label: "23", value: "23" },
-  { label: "45", value: "45" },
+  { label: "24", value: "24" },
+  { label: "25", value: "25" },
 ]
 
 const situationOptions = [
@@ -85,7 +83,19 @@ const situationOptions = [
   { label: "Inativo", value: "Inativo" },
 ]
 
+
+
 function App() {
+  const [items, setItems] = useState<ICommitties[]>(rows);
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
     coverage: '',
@@ -93,9 +103,9 @@ function App() {
     cooperative: '',
     agency: '',
     situation: '',
-    number: '',
-    date_start: '',
-    date_end: '',
+    id: '',
+    date_start: null,
+    date_end: null,
   });
 
 
@@ -106,16 +116,29 @@ function App() {
       cooperative: '',
       agency: '',
       situation: '',
-      number: '',
-      date_start: '',
-      date_end: '',
+      id: '',
+      date_start: null,
+      date_end: null,
     });
-  },[])
- 
+    setItems(rows);
+  }, [])
 
+  const handleFilter = () => {
+    const filteredData = items.filter((item: any) => {
+      let hasValues = Object.entries(filterOptions).filter(([k, v]) => {
+        return v != '' && v != null
+      })
+      return hasValues.every(([key,value]) => item[key] == value)
+      
+    })
+    setItems(filteredData);
+  }
+
+ 
   useEffect(() => {
     console.log(filterOptions);
-  }, [filterOptions])
+  },[filterOptions])
+
   return (
     <AppStyle>
       <Navbar />
@@ -191,9 +214,9 @@ function App() {
               <InputField
                 type="number"
                 label="Número"
-                value={filterOptions.number}
+                value={filterOptions.id}
                 onChangeCallback={(value: string) => {
-                  setFilterOptions({ ...filterOptions, number: value })
+                  setFilterOptions({ ...filterOptions, id: value })
                 }}
               />
             </div>
@@ -216,18 +239,76 @@ function App() {
               />
             </div>
             <div className="item">
-                <CustomButton color={'var(--green)'} eventCallback={clearFilter} border={'var(--green)'} label="Limpar Filtros" icon={<Clear />} />
-                <CustomButton color={'#FFF'} bgColor={'var(--green)'} label="Filtrar" icon={<Search />} />
+              <CustomButton color={'var(--green)'} eventCallback={clearFilter} border={'var(--green)'} label="Limpar Filtros" icon={<Clear />} />
+              <CustomButton color={'#FFF'} bgColor={'var(--green)'} label="Filtrar" icon={<Search />} eventCallback={handleFilter} />
             </div>
           </div>
 
-            <div className="registros">
-
-            </div>
+          <div className="table-committees">
+            <TableContainer component={Paper}>
+              <Table aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Número do Comitê</TableCell>
+                    <TableCell align="right">Abrangência</TableCell>
+                    <TableCell align="right">Central</TableCell>
+                    <TableCell align="right">Cooperativa</TableCell>
+                    <TableCell align="right">Agência</TableCell>
+                    <TableCell align="right">Data Início <br /> Data Fim</TableCell>
+                    <TableCell align="center">Situação</TableCell>
+                    <TableCell align="left"></TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {items.map((item: ICommitties) => (
+                    <TableRow
+                      key={item.id}
+                      sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                    >
+                      <TableCell component="th" scope="row">
+                        {item.id}
+                      </TableCell>
+                      <TableCell align="right">{item.coverage}</TableCell>
+                      <TableCell align="right">{item.central}</TableCell>
+                      <TableCell align="right">{item.cooperative}</TableCell>
+                      <TableCell align="right">{item.agency}</TableCell>
+                      <TableCell align="right">{item.date_start} <br /> {item.date_end}</TableCell>
+                      <TableCell align="right"><SituationType value={item.situation} /> </TableCell>
+                      <TableCell align="right">
+                        <Button
+                          id="basic-button"
+                          aria-controls="basic-menu"
+                          aria-haspopup="true"
+                          aria-expanded={open ? 'true' : undefined}
+                          onClick={handleClick}
+                        >
+                          <MoreVertIcon sx={{ color: 'var(--green)' }} />
+                        </Button>
+                        <Menu
+                          id="basic-menu"
+                          anchorEl={anchorEl}
+                          open={open}
+                          onClose={handleClose}
+                          MenuListProps={{
+                            'aria-labelledby': 'basic-button',
+                          }}
+                        >
+                          <MenuItem onClick={handleClose}>Editar</MenuItem>
+                          <MenuItem onClick={handleClose}>Inativar</MenuItem>
+                          <MenuItem onClick={handleClose}>Excluir</MenuItem>
+                        </Menu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </div>
         </div>
       </div>
-    </AppStyle >
+    </AppStyle>
   )
 }
 
 export default App
+

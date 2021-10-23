@@ -1,5 +1,5 @@
 import { InputHTMLAttributes } from "react";
-import TextField from '@material-ui/core/TextField';
+import TextField from '@mui/material/TextField';
 
 interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
     type: 'text' | 'password' | 'number' | 'tel' | 'email';

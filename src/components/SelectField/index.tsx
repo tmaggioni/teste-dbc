@@ -1,7 +1,7 @@
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 
 interface ISelectOption {
@@ -27,7 +27,6 @@ export const SelectField = ({ label, value,options,onChangeCallback,variant }: S
                 onChange={(e: any) => {
                     onChangeCallback(e.target.value);
                 }}>
-
                 {options.map((option : ISelectOption, index:number) => {
                     return (
                         <MenuItem key={index} value={option.value}>{option.label}</MenuItem>

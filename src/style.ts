@@ -18,4 +18,16 @@ export const AppStyle = styled.div`
             }
         }
     }
+    .table-committees{
+        width:100%;
+        margin-top:50px;
+        table{
+            thead{
+                th{
+                    padding:10px;
+                    
+                }
+            }
+        }
+    }
 `
