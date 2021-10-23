@@ -11,6 +11,7 @@ interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
 export const InputField = ({type, label, value, onChangeCallback }: InputFieldProps) => {
     return (
         <TextField
+            fullWidth
             type={type}
             label={label}
             value={value}

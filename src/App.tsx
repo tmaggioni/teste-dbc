@@ -9,7 +9,7 @@ import { DateField } from './components/DateField'
 import { CustomButton } from './components/CustomButton'
 import Clear from './assets/icons/clear';
 import Search from './assets/icons/search';
-import { makeStyles } from '@mui/styles';
+import { format } from 'date-fns'
 
 import { SituationType } from './components/SituationType'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -24,6 +24,10 @@ import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import Pagination from '@mui/material/Pagination';
+import { PaginationItem } from '@mui/material';
+
+import { makeStyles } from '@mui/styles';
 
 interface ICommitties {
   id: string;
@@ -42,6 +46,8 @@ const rows: ICommitties[] = [
   { id: "3", coverage: 'Agência', central: '1003', cooperative: 1586, agency: 24, date_start: '15/10/2021', date_end: '16/10/2021', situation: 'inativo' },
   { id: "4", coverage: 'Agência', central: '1001', cooperative: 1586, agency: 25, date_start: '16/10/2021', date_end: '17/10/2021', situation: 'vigente' },
   { id: "5", coverage: 'Cooperativa', central: '1001', cooperative: 1586, agency: 25, date_start: '17/10/2021', date_end: '18/10/2021', situation: 'vigente' },
+  { id: "6", coverage: 'Cooperativa', central: '1001', cooperative: 1586, agency: 25, date_start: '17/10/2021', date_end: '18/10/2021', situation: 'vigente' },
+  { id: "7", coverage: 'Cooperativa', central: '1001', cooperative: 1586, agency: 25, date_start: '17/10/2021', date_end: '18/10/2021', situation: 'vigente' },
 ];
 
 
@@ -84,9 +90,23 @@ const situationOptions = [
 ]
 
 
+const useStyles = makeStyles(() => ({
+  ul: {
+    "& .MuiPaginationItem-root.Mui-selected": {
+      color: "#FFF",
+      background:"var(--green)"
+    }
+  }
+}));
 
 function App() {
   const [items, setItems] = useState<ICommitties[]>(rows);
+  const [page, setPage] = useState<number>(1);
+  const [perPage, setPerPage] = useState<number>(5);
+  const classes = useStyles();
+  const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    setPage(value);
+  };
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -124,20 +144,22 @@ function App() {
   }, [])
 
   const handleFilter = () => {
-    const filteredData = items.filter((item: any) => {
+    const filteredData = rows.filter((item: any) => {
       let hasValues = Object.entries(filterOptions).filter(([k, v]) => {
         return v != '' && v != null
       })
-      return hasValues.every(([key,value]) => item[key] == value)
-      
+      return hasValues.every(([key, value]) => {
+        if (key == 'date_start' || key == 'date_end') {
+          let formatedDate = format(value, 'dd/MM/yyyy')
+          return item[key] == formatedDate
+        } else {
+          return item[key] == value
+        }
+      })
+
     })
     setItems(filteredData);
   }
-
- 
-  useEffect(() => {
-    console.log(filterOptions);
-  },[filterOptions])
 
   return (
     <AppStyle>
@@ -260,7 +282,7 @@ function App() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {items.map((item: ICommitties) => (
+                  {items.slice((page - 1) * perPage, (page - 1) * perPage + perPage).map((item: ICommitties) => (
                     <TableRow
                       key={item.id}
                       sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -289,9 +311,6 @@ function App() {
                           anchorEl={anchorEl}
                           open={open}
                           onClose={handleClose}
-                          MenuListProps={{
-                            'aria-labelledby': 'basic-button',
-                          }}
                         >
                           <MenuItem onClick={handleClose}>Editar</MenuItem>
                           <MenuItem onClick={handleClose}>Inativar</MenuItem>
@@ -303,6 +322,19 @@ function App() {
                 </TableBody>
               </Table>
             </TableContainer>
+
+            <Pagination
+              count={Math.ceil(items.length / perPage)}
+              page={page}
+              onChange={handleChange}
+              style={{
+                marginTop: "30px",
+                display: "flex",
+                justifyContent: "center",
+              }}
+              classes={{ ul: classes.ul }}
+            />
+
           </div>
         </div>
       </div>

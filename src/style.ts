@@ -10,11 +10,20 @@ export const AppStyle = styled.div`
             display:flex;
             justify-content:flex-start;
             margin-bottom:20px;
+            @media(max-width:1024px){
+                flex-direction: column;
+                align-items: center;
+                margin-bottom:0px;
+            }
             .item{
                 margin-right:10px;
                 width:100%;
                 display:flex;
                 align-items:flex-end;
+                @media(max-width:1024px){
+                    margin-bottom:10px;
+                    justify-content:center;
+                }
             }
         }
     }
