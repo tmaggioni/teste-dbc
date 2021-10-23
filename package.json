@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "serve": "vite preview",
+    "serve": "vite preview"
   },
   "dependencies": {
     "@mui/icons-material": "^5.0.4",
